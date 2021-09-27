@@ -1,9 +1,8 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, fakeAsync, flush, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { click } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 import { TUTORIALS } from 'src/app/test-data/db-data';
 
@@ -13,12 +12,10 @@ describe('TutorialsListComponent', () => {
   let component: TutorialsListComponent;
   let fixture: ComponentFixture<TutorialsListComponent>;
   let el: DebugElement
-  let tutorialService: any
+  let tutorialService: TutorialService
 
-  beforeEach(waitForAsync(() => {
-    const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['getAll', 'findByTitle'])
-
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [
         AppModule
       ],
@@ -26,24 +23,24 @@ describe('TutorialsListComponent', () => {
         TutorialsListComponent
       ],
       providers: [
-        {provide: TutorialService, useValue: tutorialServiceSpy}
+        TutorialService
       ]
-    })
-    .compileComponents()
-    .then(() => {
-      fixture = TestBed.createComponent(TutorialsListComponent);
-      component = fixture.componentInstance;
-      el = fixture.debugElement
-      tutorialService = TestBed.inject(TutorialService)
-    })
-  }))
+    }).compileComponents()
+  })
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(TutorialsListComponent);
+    component = fixture.componentInstance;
+    el = fixture.debugElement
+    tutorialService = TestBed.inject(TutorialService)
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should show tutorials list', () => {
-    tutorialService.getAll.and.returnValue(of(TUTORIALS))
+    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
@@ -54,13 +51,13 @@ describe('TutorialsListComponent', () => {
 
   it('should active after clicking', fakeAsync(() => {
     // given
-    tutorialService.getAll.and.returnValue(of(TUTORIALS))
+    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
     const items = el.queryAll(By.css('.list-group-item'))
 
-    click(items[0])
+    items[0].triggerEventHandler('click', null)
 
     fixture.detectChanges()
 
@@ -76,7 +73,7 @@ describe('TutorialsListComponent', () => {
 
   it('should return data when finding', fakeAsync(() => {
     // given
-    tutorialService.getAll.and.returnValue(of(TUTORIALS))
+    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
@@ -97,11 +94,11 @@ describe('TutorialsListComponent', () => {
       "id": "3"
     }]
 
-    tutorialService.findByTitle.and.returnValue(of(filteredData))
+    const findByTitleSpy = spyOn(tutorialService, 'findByTitle').and.returnValue(of(filteredData))
 
-    const searchBtn = el.query(By.css('.btn.btn-outline-secondary'))
+    const searchBtn = el.nativeElement.querySelector('button[id="search-btn"]')
 
-    click(searchBtn)
+    searchBtn.click()
 
     fixture.detectChanges()
 
@@ -109,6 +106,7 @@ describe('TutorialsListComponent', () => {
     console.log('filteredData ==> ', items)
 
     // then
+    expect(findByTitleSpy).toHaveBeenCalledWith(component.title)
     expect(items.length).toBe(2, 'Unexpected number of tutorials found')
     expect(items[0].nativeElement.textContent.trim()).toBe('Product Intranet Executive11111', 'Wrong title data item - 0')
     expect(items[1].nativeElement.textContent.trim()).toBe('Investor Interactions Consultant', 'Wrong title data item - 1')

@@ -1,9 +1,8 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { click } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 
 import { AddTutorialComponent } from './add-tutorial.component';
@@ -12,26 +11,24 @@ describe('AddTutorialComponent', () => {
   let component: AddTutorialComponent;
   let fixture: ComponentFixture<AddTutorialComponent>;
   let el: DebugElement
-  let tutorialService: any
+  let tutorialService: TutorialService
 
-  beforeEach(waitForAsync(() => {
-    const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['create'])
-
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       imports: [AppModule],
-      declarations: [ AddTutorialComponent ],
+      declarations: [AddTutorialComponent],
       providers: [
-        { provide: TutorialService, useValue: tutorialServiceSpy },
+        TutorialService
       ]
-    })
-    .compileComponents()
-    .then(() => {
-      fixture = TestBed.createComponent(AddTutorialComponent);
-      component = fixture.componentInstance;
-      el = fixture.debugElement
-      tutorialService = TestBed.inject(TutorialService)
-    })
-  }))
+    }).compileComponents()
+  })
+
+  beforeEach(() => {
+    fixture = TestBed.createComponent(AddTutorialComponent);
+    component = fixture.componentInstance;
+    el = fixture.debugElement
+    tutorialService = TestBed.inject(TutorialService)
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -39,13 +36,18 @@ describe('AddTutorialComponent', () => {
 
   it('should empty form when click add new tutorial', () => {
     // given
-    component.newTutorial()
+    component.submitted = true
+
     fixture.detectChanges()
+
+    const addBtn = el.nativeElement.querySelector('button[id="add-btn"]')
+
+    addBtn.click()
 
     // then
     expect(component.submitted).toBeFalse()
     expect(component.tutorial.title).toBeFalsy()
-    expect(component.tutorial.description).toBeFalsy
+    expect(component.tutorial.description).toBeFalsy()
     expect(component.tutorial.published).toBeFalse()
   })
 
@@ -55,17 +57,20 @@ describe('AddTutorialComponent', () => {
       "title": "new title",
       "description": "new description"
     }
+
     component.tutorial.title = mockData.title
     component.tutorial.description = mockData.description
 
     fixture.detectChanges()
 
-    tutorialService.create.and.returnValue(of(mockData))
+    const submitSpy = spyOn(tutorialService, 'create').and.returnValue(of(mockData))
 
-    const submitBtn = el.query(By.css('.btn.btn-success'))
-    click(submitBtn)
+    const submitBtn = el.nativeElement.querySelector('button[id="submit-btn"]')
+
+    submitBtn.click()
 
     // then
     expect(component.submitted).toBeTrue()
+    expect(submitSpy).toHaveBeenCalledWith(mockData)
   })
 });

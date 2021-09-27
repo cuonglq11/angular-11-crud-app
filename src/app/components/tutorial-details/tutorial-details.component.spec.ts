@@ -1,11 +1,10 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { click } from 'src/app/common/test-utils';
 import { Tutorial } from 'src/app/models/tutorial.model';
 import { TutorialService } from 'src/app/services/tutorial.service';
 import { TUTORIALS } from 'src/app/test-data/db-data';
@@ -16,24 +15,23 @@ describe('TutorialDetailsComponent', () => {
   let component: TutorialDetailsComponent
   let fixture: ComponentFixture<TutorialDetailsComponent>
   let el: DebugElement
-  let tutorialService: any
-  let activatedRoute: any
-  let router: any
+  let tutorialService: TutorialService
+  let activatedRoute: ActivatedRoute
+  let router: Router
 
   let mockData: Tutorial
 
-  beforeEach(waitForAsync(() => {
-    const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['get', 'update', 'delete'])
+  beforeEach(async () => {
     const routerSpy = { navigate: jasmine.createSpy('navigate') }
 
-    TestBed.configureTestingModule({
+    await TestBed.configureTestingModule({
       imports: [
         AppModule,
         RouterTestingModule
       ],
       declarations: [TutorialDetailsComponent],
       providers: [
-        { provide: TutorialService, useValue: tutorialServiceSpy },
+        TutorialService,
         {
           provide: ActivatedRoute,
           useValue: {
@@ -42,19 +40,17 @@ describe('TutorialDetailsComponent', () => {
         },
         { provide: Router, useValue: routerSpy }
       ]
-    })
-      .compileComponents()
-      .then(() => {
-        fixture = TestBed.createComponent(TutorialDetailsComponent)
-        component = fixture.componentInstance
-        el = fixture.debugElement
-        tutorialService = TestBed.inject(TutorialService)
-        activatedRoute = TestBed.inject(ActivatedRoute)
-        router = TestBed.inject(Router)
-      })
-  }))
+    }).compileComponents()
+  })
 
   beforeEach(() => {
+    fixture = TestBed.createComponent(TutorialDetailsComponent)
+    component = fixture.componentInstance
+    el = fixture.debugElement
+    tutorialService = TestBed.inject(TutorialService)
+    activatedRoute = TestBed.inject(ActivatedRoute)
+    router = TestBed.inject(Router)
+
     mockData = {
       "title": "Product Intranet Executive11111",
       "description": "Officiis inventore quae.\nAt necessitatibus voluptas deleniti expedita.\nUt nesciunt quidem sunt.\nRepellat sunt tempora impedit omnis eveniet enim.",
@@ -69,7 +65,7 @@ describe('TutorialDetailsComponent', () => {
 
   it('should show tutorial with id = 2', () => {
     // given
-    tutorialService.get.and.returnValue(of(mockData))
+    spyOn(tutorialService, 'get').and.returnValue(of(mockData))
     fixture.detectChanges()
 
     // then
@@ -79,7 +75,7 @@ describe('TutorialDetailsComponent', () => {
 
   it('should update publish the tutorial', () => {
     // given
-    tutorialService.get.and.returnValue(of(mockData))
+    spyOn(tutorialService, 'get').and.returnValue(of(mockData))
     fixture.detectChanges()
 
     const data = {
@@ -88,16 +84,53 @@ describe('TutorialDetailsComponent', () => {
       published: false
     }
 
-    tutorialService.update.and.returnValue(of(data))
+    component.currentTutorial.title = data.title
+    component.currentTutorial.description = data.description
+    fixture.detectChanges()
 
-    const publishBtn = el.query(By.css('.badge.badge-primary.mr-2'))
+    const updateSpy = spyOn(tutorialService, 'update').and.returnValue(of(data))
 
-    click(publishBtn)
+    const publishBtn = el.nativeElement.querySelector('button[id="unpublish-btn"]')
+
+    publishBtn.click()
 
     component.currentTutorial = {...mockData, ...data}
 
     // then
     expect(component.message).toEqual('This tutorial was updated successfully!')
+    expect(updateSpy).toHaveBeenCalledWith(component.currentTutorial.id, data)
+    expect(component.currentTutorial.title).toEqual(data.title)
+    expect(component.currentTutorial.description).toEqual(data.description)
+    expect(component.currentTutorial.published).toEqual(data.published)
+  })
+
+  it('should update unpublish the tutorial', () => {
+    // given
+    mockData.published = false
+    spyOn(tutorialService, 'get').and.returnValue(of(mockData))
+    fixture.detectChanges()
+
+    const data = {
+      title: 'new title',
+      description: 'new desc',
+      published: true
+    }
+
+    component.currentTutorial.title = data.title
+    component.currentTutorial.description = data.description
+    fixture.detectChanges()
+
+    const updateSpy = spyOn(tutorialService, 'update').and.returnValue(of(data))
+
+    const publishBtn = el.nativeElement.querySelector('button[id="publish-btn"]')
+
+    publishBtn.click()
+
+    component.currentTutorial = {...mockData, ...data}
+
+    // then
+    expect(component.message).toEqual('This tutorial was updated successfully!')
+    expect(updateSpy).toHaveBeenCalledWith(component.currentTutorial.id, data)
     expect(component.currentTutorial.title).toEqual(data.title)
     expect(component.currentTutorial.description).toEqual(data.description)
     expect(component.currentTutorial.published).toEqual(data.published)
@@ -105,7 +138,7 @@ describe('TutorialDetailsComponent', () => {
 
   it('should update details of the tutorial', () => {
     // given
-    tutorialService.get.and.returnValue(of(mockData))
+    spyOn(tutorialService, 'get').and.returnValue(of(mockData))
     fixture.detectChanges()
 
     const data = {
@@ -114,16 +147,22 @@ describe('TutorialDetailsComponent', () => {
       published: false
     }
 
-    tutorialService.update.and.returnValue(of(data))
+    component.currentTutorial.title = data.title
+    component.currentTutorial.description = data.description
+    component.currentTutorial.published = data.published
+    fixture.detectChanges()
 
-    const updateBtn = el.query(By.css('.badge.badge-success.mb-2'))
+    const updateSpy = spyOn(tutorialService, 'update').and.returnValue(of(data))
 
-    click(updateBtn)
+    const updateBtn = el.nativeElement.querySelector('button[id="update-btn"]')
+
+    updateBtn.click()
 
     component.currentTutorial = {...mockData, ...data}
 
     // then
     expect(component.message).toEqual('This tutorial was updated successfully!')
+    expect(updateSpy).toHaveBeenCalledWith(component.currentTutorial.id, component.currentTutorial)
     expect(component.currentTutorial.title).toEqual(data.title)
     expect(component.currentTutorial.description).toEqual(data.description)
     expect(component.currentTutorial.published).toEqual(data.published)
@@ -131,17 +170,18 @@ describe('TutorialDetailsComponent', () => {
 
   it('should delete the tutorial', () => {
     // given
-    tutorialService.get.and.returnValue(of(mockData))
+    spyOn(tutorialService, 'get').and.returnValue(of(mockData))
     fixture.detectChanges()
 
-    tutorialService.delete.and.returnValue(of(TUTORIALS[0]))
+    const deleteSpy = spyOn(tutorialService, 'delete').and.returnValue(of(TUTORIALS[0]))
 
-    const deleteBtn = el.query(By.css('.badge.badge-danger.mr-2'))
+    const deleteBtn = el.nativeElement.querySelector('button[id="delete-btn"]')
 
-    click(deleteBtn)
+    deleteBtn.click()
 
     // then
     expect(component.message).toBeFalsy()
+    expect(deleteSpy).toHaveBeenCalledWith(component.currentTutorial.id)
     expect(router.navigate).toHaveBeenCalledWith(['/tutorials'])
   })
 });

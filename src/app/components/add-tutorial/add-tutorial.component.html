@@ -24,12 +24,12 @@
         />
       </div>
 
-      <button (click)="saveTutorial()" class="btn btn-success">Submit</button>
+      <button (click)="saveTutorial()" class="btn btn-success" id="submit-btn">Submit</button>
     </div>
 
     <div *ngIf="submitted">
       <h4>Tutorial was submitted successfully!</h4>
-      <button class="btn btn-success" (click)="newTutorial()">Add</button>
+      <button class="btn btn-success" (click)="newTutorial()" id="add-btn">Add</button>
     </div>
   </div>
 </div>
