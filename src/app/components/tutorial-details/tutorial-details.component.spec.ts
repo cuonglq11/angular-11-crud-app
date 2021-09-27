@@ -12,7 +12,7 @@ import { TUTORIALS } from 'src/app/test-data/db-data';
 
 import { TutorialDetailsComponent } from './tutorial-details.component';
 
-fdescribe('TutorialDetailsComponent', () => {
+describe('TutorialDetailsComponent', () => {
   let component: TutorialDetailsComponent
   let fixture: ComponentFixture<TutorialDetailsComponent>
   let el: DebugElement

@@ -3,6 +3,7 @@ import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testi
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
+import { click, clickByInnerHTML } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 import { TUTORIALS } from 'src/app/test-data/db-data';
 
@@ -32,53 +33,6 @@ describe('TutorialsListComponent', () => {
     fixture = TestBed.createComponent(TutorialsListComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-  })
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('should show tutorials list', () => {
-    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
-
-    fixture.detectChanges()
-
-    const items = el.queryAll(By.css('.list-group-item'))
-
-    expect(items.length).toBe(10, 'Unexpected number of tutorials found')
-  })
-
-  it('should active after clicking', fakeAsync(() => {
-    // given
-    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
-
-    fixture.detectChanges()
-
-    const items = el.queryAll(By.css('.list-group-item'))
-
-    items[0].triggerEventHandler('click', null)
-
-    fixture.detectChanges()
-
-    flush()
-
-    const clickedItem = el.query(By.css('.list-group-item.active'))
-
-    // then
-    expect(clickedItem).toBe(items[0])
-
-    expect(component.currentTutorial).toBe(TUTORIALS[0], 'Wrong current tutorial data')
-  }))
-
-  it('should return data when finding', fakeAsync(() => {
-    // given
-    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
-
-    fixture.detectChanges()
-
-    component.title = 'in'
-
-    fixture.detectChanges()
 
     const filteredData = [{
       "title": "Product Intranet Executive11111",
@@ -93,20 +47,52 @@ describe('TutorialsListComponent', () => {
       "id": "3"
     }]
 
+    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
     tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
+    fixture.detectChanges()
+  })
 
-    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Search')
-    submitBtn!.triggerEventHandler('click', null)
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should show tutorials list', () => {
+    const items = el.queryAll(By.css('.list-group-item'))
+
+    expect(items.length).toBe(10, 'Unexpected number of tutorials found')
+  })
+
+  it('should active after clicking', () => {
+    // given
+    const items = el.queryAll(By.css('.list-group-item'))
+
+    click(items[0])
+
+    fixture.detectChanges()
+
+    const clickedItem = el.query(By.css('.list-group-item.active'))
+
+    // then
+    expect(clickedItem).toBe(items[0])
+    expect(component.currentTutorial).toBe(TUTORIALS[0], 'Wrong current tutorial data')
+  })
+
+  it('should return data when finding', () => {
+    // given
+    component.title = 'in'
+
+    fixture.detectChanges()
+
+    clickByInnerHTML(el, 'button', 'Search')
 
     fixture.detectChanges()
 
     const items = el.queryAll(By.css('.list-group-item'))
-    console.log('filteredData ==> ', items)
 
     // then
     expect(tutorialServiceSpy.findByTitle).toHaveBeenCalledWith(component.title)
     expect(items.length).toBe(2, 'Unexpected number of tutorials found')
     expect(items[0].nativeElement.textContent.trim()).toBe('Product Intranet Executive11111', 'Wrong title data item - 0')
     expect(items[1].nativeElement.textContent.trim()).toBe('Investor Interactions Consultant', 'Wrong title data item - 1')
-  }))
+  })
 });
