@@ -40,7 +40,7 @@ describe('AddTutorialComponent', () => {
     fixture.detectChanges()
 
     const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Add')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     // then
     expect(component.submitted).toBeFalse()
@@ -64,7 +64,7 @@ describe('AddTutorialComponent', () => {
     tutorialServiceSpy.create.and.returnValue(of(mockData))
 
     const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Submit')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     // then
     expect(component.submitted).toBeTrue()

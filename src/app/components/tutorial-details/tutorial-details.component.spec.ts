@@ -90,7 +90,7 @@ describe('TutorialDetailsComponent', () => {
     tutorialServiceSpy.update.and.returnValue(of(data))
 
     const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'UnPublish')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -121,7 +121,7 @@ describe('TutorialDetailsComponent', () => {
     tutorialServiceSpy.update.and.returnValue(of(data))
 
     const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Publish')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -152,7 +152,7 @@ describe('TutorialDetailsComponent', () => {
     tutorialServiceSpy.update.and.returnValue(of(data))
 
     const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Update')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -172,7 +172,7 @@ describe('TutorialDetailsComponent', () => {
     tutorialServiceSpy.delete.and.returnValue(of(TUTORIALS[0]))
 
     const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Delete')
-    submitBtn?.triggerEventHandler('click', null)
+    submitBtn!.triggerEventHandler('click', null)
 
     // then
     expect(component.message).toBeFalsy()
