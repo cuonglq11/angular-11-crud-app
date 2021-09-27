@@ -120,7 +120,6 @@ describe('TutorialService', () => {
     }]
 
     service.findByTitle('Executive11111').subscribe(items => {
-      console.log(items)
       expect(items).toBeTruthy('No tutorials returned');
       expect(items.length).toBe(1, 'Incorrect number of tutorials');
     })

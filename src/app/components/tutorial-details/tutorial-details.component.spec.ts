@@ -16,16 +16,13 @@ describe('TutorialDetailsComponent', () => {
   let component: TutorialDetailsComponent
   let fixture: ComponentFixture<TutorialDetailsComponent>
   let el: DebugElement
-  let activatedRoute: ActivatedRoute
-  let router: Router
   const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['get', 'update', 'delete'])
+  const routerSpy = { navigate: jasmine.createSpy('navigate') }
 
   let mockData: Tutorial,
     resData: Tutorial
 
   beforeEach(async () => {
-    const routerSpy = { navigate: jasmine.createSpy('navigate') }
-
     await TestBed.configureTestingModule({
       imports: [
         AppModule,
@@ -49,8 +46,6 @@ describe('TutorialDetailsComponent', () => {
     fixture = TestBed.createComponent(TutorialDetailsComponent)
     component = fixture.componentInstance
     el = fixture.debugElement
-    activatedRoute = TestBed.inject(ActivatedRoute)
-    router = TestBed.inject(Router)
 
     mockData = {
       "title": "Product Intranet Executive11111",
@@ -146,6 +141,6 @@ describe('TutorialDetailsComponent', () => {
     // then
     expect(component.message).toBeFalsy()
     expect(tutorialServiceSpy.delete).toHaveBeenCalledWith(component.currentTutorial.id)
-    expect(router.navigate).toHaveBeenCalledWith(['/tutorials'])
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/tutorials'])
   })
 });
