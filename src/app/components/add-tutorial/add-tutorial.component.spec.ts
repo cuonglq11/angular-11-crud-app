@@ -1,6 +1,5 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
 import { TutorialService } from 'src/app/services/tutorial.service';
@@ -27,7 +26,6 @@ describe('AddTutorialComponent', () => {
     fixture = TestBed.createComponent(AddTutorialComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-    // tutorialService = TestBed.inject(TutorialService)
   })
 
   it('should create', () => {
