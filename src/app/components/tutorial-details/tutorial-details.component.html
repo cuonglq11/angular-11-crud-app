@@ -33,7 +33,6 @@
       class="badge badge-primary mr-2"
       *ngIf="currentTutorial.published"
       (click)="updatePublished(false)"
-      id="unpublish-btn"
     >
       UnPublish
     </button>
@@ -41,7 +40,6 @@
       *ngIf="!currentTutorial.published"
       class="badge badge-primary mr-2"
       (click)="updatePublished(true)"
-      id="publish-btn"
     >
       Publish
     </button>
@@ -54,7 +52,6 @@
       type="submit"
       class="badge badge-success mb-2"
       (click)="updateTutorial()"
-      id="update-btn"
     >
       Update
     </button>
