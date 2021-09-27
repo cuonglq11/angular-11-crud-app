@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
+import { clickByInnerHTML } from 'src/app/common/test-utils';
+import { Tutorial } from 'src/app/models/tutorial.model';
 import { TutorialService } from 'src/app/services/tutorial.service';
 
 import { AddTutorialComponent } from './add-tutorial.component';
@@ -12,6 +14,8 @@ describe('AddTutorialComponent', () => {
   let fixture: ComponentFixture<AddTutorialComponent>;
   let el: DebugElement
   const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['create'])
+
+  let mockData: Tutorial
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -27,6 +31,13 @@ describe('AddTutorialComponent', () => {
     fixture = TestBed.createComponent(AddTutorialComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
+
+    mockData = {
+      "title": "new title",
+      "description": "new description"
+    }
+
+    tutorialServiceSpy.create.and.returnValue(of(mockData))
   })
 
   it('should create', () => {
@@ -39,8 +50,7 @@ describe('AddTutorialComponent', () => {
 
     fixture.detectChanges()
 
-    const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Add')
-    submitBtn!.triggerEventHandler('click', null)
+    clickByInnerHTML(el, '.btn.btn-success', 'Add')
 
     // then
     expect(component.submitted).toBeFalse()
@@ -51,20 +61,12 @@ describe('AddTutorialComponent', () => {
 
   it('should create when click create new tutorial', () => {
     // given
-    const mockData = {
-      "title": "new title",
-      "description": "new description"
-    }
-
     component.tutorial.title = mockData.title
     component.tutorial.description = mockData.description
 
     fixture.detectChanges()
-    console.log('component ==> ', el.nativeElement.outerHTML)
-    tutorialServiceSpy.create.and.returnValue(of(mockData))
 
-    const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Submit')
-    submitBtn!.triggerEventHandler('click', null)
+    clickByInnerHTML(el, '.btn.btn-success', 'Submit')
 
     // then
     expect(component.submitted).toBeTrue()
