@@ -1,5 +1,6 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
@@ -71,7 +72,7 @@ describe('TutorialDetailsComponent', () => {
     expect(component.message).toBeFalsy()
   })
 
-  it('should update publish the tutorial', () => {
+  it('should update unpublish the tutorial', () => {
     // given
     tutorialServiceSpy.get.and.returnValue(of(mockData))
     fixture.detectChanges()
@@ -88,9 +89,8 @@ describe('TutorialDetailsComponent', () => {
 
     tutorialServiceSpy.update.and.returnValue(of(data))
 
-    const publishBtn = el.nativeElement.querySelector('button[id="unpublish-btn"]')
-
-    publishBtn.click()
+    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'UnPublish')
+    submitBtn?.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -102,7 +102,7 @@ describe('TutorialDetailsComponent', () => {
     expect(component.currentTutorial.published).toEqual(data.published)
   })
 
-  it('should update unpublish the tutorial', () => {
+  it('should update publish the tutorial', () => {
     // given
     mockData.published = false
     tutorialServiceSpy.get.and.returnValue(of(mockData))
@@ -120,9 +120,8 @@ describe('TutorialDetailsComponent', () => {
 
     tutorialServiceSpy.update.and.returnValue(of(data))
 
-    const publishBtn = el.nativeElement.querySelector('button[id="publish-btn"]')
-
-    publishBtn.click()
+    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Publish')
+    submitBtn?.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -152,9 +151,8 @@ describe('TutorialDetailsComponent', () => {
 
     tutorialServiceSpy.update.and.returnValue(of(data))
 
-    const updateBtn = el.nativeElement.querySelector('button[id="update-btn"]')
-
-    updateBtn.click()
+    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Update')
+    submitBtn?.triggerEventHandler('click', null)
 
     component.currentTutorial = {...mockData, ...data}
 
@@ -173,9 +171,8 @@ describe('TutorialDetailsComponent', () => {
 
     tutorialServiceSpy.delete.and.returnValue(of(TUTORIALS[0]))
 
-    const deleteBtn = el.nativeElement.querySelector('button[id="delete-btn"]')
-
-    deleteBtn.click()
+    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Delete')
+    submitBtn?.triggerEventHandler('click', null)
 
     // then
     expect(component.message).toBeFalsy()

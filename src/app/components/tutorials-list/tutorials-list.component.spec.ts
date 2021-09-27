@@ -95,9 +95,8 @@ describe('TutorialsListComponent', () => {
 
     tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
 
-    const searchBtn = el.nativeElement.querySelector('button[id="search-btn"]')
-
-    searchBtn.click()
+    const submitBtn = el.queryAll(By.css('button')).find(el => el.nativeElement.innerHTML.trim() === 'Search')
+    submitBtn?.triggerEventHandler('click', null)
 
     fixture.detectChanges()
 

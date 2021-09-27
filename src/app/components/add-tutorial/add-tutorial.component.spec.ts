@@ -1,5 +1,6 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
 import { TutorialService } from 'src/app/services/tutorial.service';
@@ -38,9 +39,8 @@ describe('AddTutorialComponent', () => {
 
     fixture.detectChanges()
 
-    const addBtn = el.nativeElement.querySelector('button[id="add-btn"]')
-
-    addBtn.click()
+    const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Add')
+    submitBtn?.triggerEventHandler('click', null)
 
     // then
     expect(component.submitted).toBeFalse()
@@ -60,12 +60,11 @@ describe('AddTutorialComponent', () => {
     component.tutorial.description = mockData.description
 
     fixture.detectChanges()
-
+    console.log('component ==> ', el.nativeElement.outerHTML)
     tutorialServiceSpy.create.and.returnValue(of(mockData))
 
-    const submitBtn = el.nativeElement.querySelector('button[id="submit-btn"]')
-
-    submitBtn.click()
+    const submitBtn = el.queryAll(By.css('.btn.btn-success')).find(el => el.nativeElement.innerHTML.trim() === 'Submit')
+    submitBtn?.triggerEventHandler('click', null)
 
     // then
     expect(component.submitted).toBeTrue()
