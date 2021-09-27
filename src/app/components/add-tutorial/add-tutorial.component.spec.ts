@@ -11,14 +11,14 @@ describe('AddTutorialComponent', () => {
   let component: AddTutorialComponent;
   let fixture: ComponentFixture<AddTutorialComponent>;
   let el: DebugElement
-  let tutorialService: TutorialService
+  const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['create'])
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppModule],
       declarations: [AddTutorialComponent],
       providers: [
-        TutorialService
+        { provide: TutorialService, useValue: tutorialServiceSpy },
       ]
     }).compileComponents()
   })
@@ -27,7 +27,7 @@ describe('AddTutorialComponent', () => {
     fixture = TestBed.createComponent(AddTutorialComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-    tutorialService = TestBed.inject(TutorialService)
+    // tutorialService = TestBed.inject(TutorialService)
   })
 
   it('should create', () => {
@@ -63,7 +63,7 @@ describe('AddTutorialComponent', () => {
 
     fixture.detectChanges()
 
-    const submitSpy = spyOn(tutorialService, 'create').and.returnValue(of(mockData))
+    tutorialServiceSpy.create.and.returnValue(of(mockData))
 
     const submitBtn = el.nativeElement.querySelector('button[id="submit-btn"]')
 
@@ -71,6 +71,6 @@ describe('AddTutorialComponent', () => {
 
     // then
     expect(component.submitted).toBeTrue()
-    expect(submitSpy).toHaveBeenCalledWith(mockData)
+    expect(tutorialServiceSpy.create).toHaveBeenCalledWith(mockData)
   })
 });

@@ -12,7 +12,7 @@ describe('TutorialsListComponent', () => {
   let component: TutorialsListComponent;
   let fixture: ComponentFixture<TutorialsListComponent>;
   let el: DebugElement
-  let tutorialService: TutorialService
+  const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['getAll', 'findByTitle'])
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
@@ -23,7 +23,7 @@ describe('TutorialsListComponent', () => {
         TutorialsListComponent
       ],
       providers: [
-        TutorialService
+        {provide: TutorialService, useValue: tutorialServiceSpy}
       ]
     }).compileComponents()
   })
@@ -32,7 +32,6 @@ describe('TutorialsListComponent', () => {
     fixture = TestBed.createComponent(TutorialsListComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-    tutorialService = TestBed.inject(TutorialService)
   })
 
   it('should create', () => {
@@ -40,7 +39,7 @@ describe('TutorialsListComponent', () => {
   });
 
   it('should show tutorials list', () => {
-    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
+    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
@@ -51,7 +50,7 @@ describe('TutorialsListComponent', () => {
 
   it('should active after clicking', fakeAsync(() => {
     // given
-    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
+    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
@@ -73,7 +72,7 @@ describe('TutorialsListComponent', () => {
 
   it('should return data when finding', fakeAsync(() => {
     // given
-    spyOn(tutorialService, 'getAll').and.returnValue(of(TUTORIALS))
+    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
 
     fixture.detectChanges()
 
@@ -94,7 +93,7 @@ describe('TutorialsListComponent', () => {
       "id": "3"
     }]
 
-    const findByTitleSpy = spyOn(tutorialService, 'findByTitle').and.returnValue(of(filteredData))
+    tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
 
     const searchBtn = el.nativeElement.querySelector('button[id="search-btn"]')
 
@@ -106,7 +105,7 @@ describe('TutorialsListComponent', () => {
     console.log('filteredData ==> ', items)
 
     // then
-    expect(findByTitleSpy).toHaveBeenCalledWith(component.title)
+    expect(tutorialServiceSpy.findByTitle).toHaveBeenCalledWith(component.title)
     expect(items.length).toBe(2, 'Unexpected number of tutorials found')
     expect(items[0].nativeElement.textContent.trim()).toBe('Product Intranet Executive11111', 'Wrong title data item - 0')
     expect(items[1].nativeElement.textContent.trim()).toBe('Investor Interactions Consultant', 'Wrong title data item - 1')
