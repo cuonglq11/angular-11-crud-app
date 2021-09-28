@@ -1,9 +1,8 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed } from '@angular/core/testing';
-import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { click, clickByInnerHTML } from 'src/app/common/test-utils';
+import { click, clickByInnerHTML, getAllListByCss, getDebugElByCss } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 import { TUTORIALS } from 'src/app/test-data/db-data';
 
@@ -29,6 +28,9 @@ describe('TutorialsListComponent', () => {
   }]
 
   beforeEach(async () => {
+    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
+    tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
+
     await TestBed.configureTestingModule({
       imports: [
         AppModule
@@ -46,9 +48,6 @@ describe('TutorialsListComponent', () => {
     fixture = TestBed.createComponent(TutorialsListComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-
-    tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
-    tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
     fixture.detectChanges()
   })
 
@@ -57,20 +56,20 @@ describe('TutorialsListComponent', () => {
   });
 
   it('should show tutorials list', () => {
-    const items = el.queryAll(By.css('.list-group-item'))
+    const items = getAllListByCss(el, '.list-group-item')
 
     expect(items.length).toBe(10, 'Unexpected number of tutorials found')
   })
 
   it('should active after clicking', () => {
     // given
-    const items = el.queryAll(By.css('.list-group-item'))
+    const items = getAllListByCss(el, '.list-group-item')
 
     click(items[0])
 
     fixture.detectChanges()
 
-    const clickedItem = el.query(By.css('.list-group-item.active'))
+    const clickedItem = getDebugElByCss(el, '.list-group-item.active')
 
     // then
     expect(clickedItem).toBe(items[0])
@@ -87,7 +86,7 @@ describe('TutorialsListComponent', () => {
 
     fixture.detectChanges()
 
-    const items = el.queryAll(By.css('.list-group-item'))
+    const items = getAllListByCss(el, '.list-group-item')
 
     // then
     expect(tutorialServiceSpy.findByTitle).toHaveBeenCalledWith(component.title)

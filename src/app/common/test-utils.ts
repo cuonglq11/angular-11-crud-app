@@ -25,3 +25,11 @@ export function clickByInnerHTML(el: DebugElement, class_name: string, inner_tex
 export function getInputValueById(el: DebugElement, input_id: string) {
   return el.query(By.css(input_id)).nativeElement.value
 }
+
+export function getAllListByCss(el: DebugElement, class_name: string) {
+  return el.queryAll(By.css(class_name))
+}
+
+export function getDebugElByCss(el: DebugElement, class_name: string) {
+  return el.query(By.css(class_name))
+}

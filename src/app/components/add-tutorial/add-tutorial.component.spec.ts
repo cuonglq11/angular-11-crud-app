@@ -1,8 +1,8 @@
 import { DebugElement } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { clickByInnerHTML } from 'src/app/common/test-utils';
+import { clickByInnerHTML, getInputValueById } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 
 import { AddTutorialComponent } from './add-tutorial.component';
@@ -13,9 +13,11 @@ describe('AddTutorialComponent', () => {
   let el: DebugElement
   const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['create'])
 
-  let mockData = { "title": "new title", "description": "new description" }
+  const mockData = { "title": "new title", "description": "new description" }
 
   beforeEach(async () => {
+    tutorialServiceSpy.create.and.returnValue(of(mockData))
+
     await TestBed.configureTestingModule({
       imports: [AppModule],
       declarations: [AddTutorialComponent],
@@ -29,8 +31,7 @@ describe('AddTutorialComponent', () => {
     fixture = TestBed.createComponent(AddTutorialComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-
-    tutorialServiceSpy.create.and.returnValue(of(mockData))
+    fixture.detectChanges()
   })
 
   it('should create', () => {
@@ -43,7 +44,7 @@ describe('AddTutorialComponent', () => {
 
     fixture.detectChanges()
 
-    clickByInnerHTML(el, '.btn.btn-success', 'Add')
+    clickByInnerHTML(el, 'button', 'Add')
 
     // then
     expect(component.submitted).toBeFalse()
@@ -52,17 +53,20 @@ describe('AddTutorialComponent', () => {
     expect(component.tutorial.published).toBeFalse()
   })
 
-  it('should create when click create new tutorial', () => {
+  it('should create when click create new tutorial', fakeAsync(() => {
     // given
     component.tutorial.title = mockData.title
     component.tutorial.description = mockData.description
-
     fixture.detectChanges()
 
-    clickByInnerHTML(el, '.btn.btn-success', 'Submit')
+    flush()
+
+    clickByInnerHTML(el, 'button', 'Submit')
 
     // then
     expect(component.submitted).toBeTrue()
     expect(tutorialServiceSpy.create).toHaveBeenCalledWith(mockData)
-  })
+    expect(getInputValueById(el, '#title')).toEqual(mockData.title)
+    expect(getInputValueById(el, '#description')).toEqual(mockData.description)
+  }))
 });
