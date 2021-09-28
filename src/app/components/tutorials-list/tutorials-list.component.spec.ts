@@ -15,6 +15,19 @@ describe('TutorialsListComponent', () => {
   let el: DebugElement
   const tutorialServiceSpy = jasmine.createSpyObj('TutorialService', ['getAll', 'findByTitle'])
 
+  let filteredData = [{
+    "title": "Product Intranet Executive11111",
+    "description": "Officiis inventore quae.\nAt necessitatibus voluptas deleniti expedita.\nUt nesciunt quidem sunt.\nRepellat sunt tempora impedit omnis eveniet enim.",
+    "published": true,
+    "id": "2"
+  },
+  {
+    "title": "Investor Interactions Consultant",
+    "description": "maiores1111111",
+    "published": true,
+    "id": "3"
+  }]
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
@@ -33,19 +46,6 @@ describe('TutorialsListComponent', () => {
     fixture = TestBed.createComponent(TutorialsListComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
-
-    const filteredData = [{
-      "title": "Product Intranet Executive11111",
-      "description": "Officiis inventore quae.\nAt necessitatibus voluptas deleniti expedita.\nUt nesciunt quidem sunt.\nRepellat sunt tempora impedit omnis eveniet enim.",
-      "published": true,
-      "id": "2"
-    },
-    {
-      "title": "Investor Interactions Consultant",
-      "description": "maiores1111111",
-      "published": true,
-      "id": "3"
-    }]
 
     tutorialServiceSpy.getAll.and.returnValue(of(TUTORIALS))
     tutorialServiceSpy.findByTitle.and.returnValue(of(filteredData))
