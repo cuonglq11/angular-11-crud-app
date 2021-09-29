@@ -5,6 +5,7 @@ import { AppModule } from 'src/app/app.module';
 import { click, clickByInnerHTML, getAllListByCss, getDebugElByCss } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
 import { TUTORIALS } from 'src/app/test-data/db-data';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { TutorialsListComponent } from './tutorials-list.component';
 
@@ -33,7 +34,7 @@ describe('TutorialsListComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [
-        AppModule
+        AppModule, NoopAnimationsModule
       ],
       declarations: [
         TutorialsListComponent
