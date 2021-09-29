@@ -1,9 +1,11 @@
 import { DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { AppModule } from 'src/app/app.module';
-import { clickByInnerHTML, getInputValueById } from 'src/app/common/test-utils';
+import { clickByInnerHTML, getInnerTextValueById, getInputValueById, getNativeElByCss } from 'src/app/common/test-utils';
 import { TutorialService } from 'src/app/services/tutorial.service';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations'
 
 import { AddTutorialComponent } from './add-tutorial.component';
 
@@ -19,7 +21,7 @@ describe('AddTutorialComponent', () => {
     tutorialServiceSpy.create.and.returnValue(of(mockData))
 
     await TestBed.configureTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, NoopAnimationsModule],
       declarations: [AddTutorialComponent],
       providers: [
         { provide: TutorialService, useValue: tutorialServiceSpy },
@@ -34,19 +36,21 @@ describe('AddTutorialComponent', () => {
     fixture.detectChanges()
   })
 
+  afterEach(() => {
+    fixture.destroy()
+  })
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
   it('should empty form when click add new tutorial', () => {
-    // given
     component.submitted = true
 
     fixture.detectChanges()
 
     clickByInnerHTML(el, 'button', 'Add')
 
-    // then
     expect(component.submitted).toBeFalse()
     expect(component.tutorial.title).toBeFalsy()
     expect(component.tutorial.description).toBeFalsy()
@@ -54,19 +58,23 @@ describe('AddTutorialComponent', () => {
   })
 
   it('should create when click create new tutorial', fakeAsync(() => {
-    // given
+    const titleEl = getNativeElByCss(el, '#title')
+    const descEl = getNativeElByCss(el, '#description')
+
     component.tutorial.title = mockData.title
     component.tutorial.description = mockData.description
     fixture.detectChanges()
+    tick()
 
-    flush()
+    expect(titleEl.value).toEqual(mockData.title)
+    expect(descEl.value).toEqual(mockData.description)
 
     clickByInnerHTML(el, 'button', 'Submit')
+    tick()
+    fixture.detectChanges()
 
-    // then
     expect(component.submitted).toBeTrue()
     expect(tutorialServiceSpy.create).toHaveBeenCalledWith(mockData)
-    expect(getInputValueById(el, '#title')).toEqual(mockData.title)
-    expect(getInputValueById(el, '#description')).toEqual(mockData.description)
+    expect(getInnerTextValueById(el, 'h4')).toBe('Tutorial was submitted successfully!')
   }))
 });
