@@ -31,9 +31,9 @@ describe('TutorialDetailsComponent', () => {
   }
 
   beforeEach(async () => {
-    tutorialServiceSpy.get.and.returnValue(of(mockData))
-    tutorialServiceSpy.update.and.returnValue(of(resData))
-    tutorialServiceSpy.delete.and.returnValue(of(TUTORIALS[0]))
+    tutorialServiceSpy.get.and.returnValue(of({...mockData}))
+    tutorialServiceSpy.update.and.returnValue(of({...resData}))
+    tutorialServiceSpy.delete.and.returnValue(of({...TUTORIALS[0]}))
 
     await TestBed.configureTestingModule({
       imports: [AppModule, RouterTestingModule, NoopAnimationsModule],
