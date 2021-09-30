@@ -28,7 +28,7 @@ describe('AddTutorialComponent', () => {
     }).compileComponents()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = TestBed.createComponent(AddTutorialComponent);
     component = fixture.componentInstance;
     el = fixture.debugElement
